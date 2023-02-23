@@ -1,0 +1,106 @@
+<div class="banner position-relative" style="background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url('<%= @list.photo.attached? ? cl_image_path(@list.photo.key, crop: :fill) : asset_path('list_background.jpg') %>');">
+  <div class="container">
+    <h1><%= @list.name %></h1>
+  </div>
+  <span class="movie-tag"><%= pluralize(@list.movies.size, 'movie') %></span>
+</div>
+
+
+<div class="container show-page-cont">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h3>My Lists</h3>
+    <div>
+      <button type="button" class="btn btn-flat btn-add-movie" data-bs-toggle="modal" data-bs-target="#new_movie_modal" >Add a movie </button>
+      <%= link_to 'Delete this list',
+              list_path(@list), class: "btn btn-danger",
+              method: :delete,
+              data: { confirm: "Are you sure you want to remove #{@list.name}" } %>
+    </div>
+
+  </div>
+
+  <div class="show-cards">
+    <% @list.movies.each do |movie| %>
+      <% bookmark = Bookmark.find_by(list: @list, movie: movie) %>
+      <div class="show-card-container" data-controller="aos" data-aos="flip-up" data-aos-duration="2000">
+        <div class="card-category show-card-image" style="background-image: url('<%= movie.poster_url%>')">
+        </div>
+        <div class="card-body">
+          <div class="card-title-cont">
+            <h5 class="show-card-title"><%= movie.title %></h5>
+            <p class="show-card-rating"><%= movie.rating %> <i class="fas fa-star star-yellow"></i> </p>
+          </div>
+          <p class="show-card-text"> <%= movie.overview %></p>
+          <div class="show-card-actions">
+            <div class='show-card-comment'>
+              <i class="fa-solid fa-quote-left"></i>
+              <p><%= bookmark.comment %></p>
+            </div>
+
+            <%= link_to '<i class="fas fa-trash"></i>'.html_safe,
+              bookmark_path(bookmark), class: "bookmark-delete",
+              method: :delete,
+              data: { confirm: "Are you sure you want to remove #{movie.title} from your #{@list.name} list" } %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+
+  <hr class="my-5" >
+
+
+  <div class="row">
+    <div class="col-12 col-sm-6">
+      <h3>Reviews</h3>
+      <% if @list.reviews.empty? %>
+        <small><em class="text-muted">Be the first one to review this list</em></small>
+      <% end %>
+      <% @list.reviews.each do |review| %>
+        <div>
+          <% review.rating.times do %>
+            <i class="fas fa-star star-yellow"></i>
+          <% end %>
+          <small><em class="text-muted"><%= distance_of_time_in_words_to_now(review.created_at) %> ago</em></small>
+          <p class="mb-0"><%= review.comment %></p>
+        </div>
+      <hr>
+      <% end %>
+    </div>
+    <div class="col-12 col-sm-6">
+      <div class="bg-white rounded p-3">
+        <h5>Add your review</h5>
+        <%= simple_form_for([@list, @review], remote: true) do |f| %>
+          <%= f.input :comment, placeholder: "Add your review here..." %>
+          <%= f.input :rating, as: :select, collection: (1..5), required: true, prompt: "What's your rating", input_html: { data: { controller: "jquery-bar-rating" } } %>
+          <%= f.submit class:"btn btn-flat" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+<hr class="my-5">
+
+  <div class="modal fade" id="new_movie_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add a movie to your <%= @list.name %> list</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <%= simple_form_for([@list, @bookmark], remote: true) do |f| %>
+            <%= f.association :movie, collection: Movie.all.order(:title), prompt: "Select a movie", input_html: { data: { controller: "select2" }}, label_html: {class: "modal-form-label"} %>
+            <%= f.input :comment, placeholder: "Enter a comment about the movie", label_html: {class: "modal-form-label"} %>
+          <div class="modal-footer">
+          <%= f.submit "Add movie", class: "btn btn-flat" %>
+          <% end %>
+          <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Back</button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

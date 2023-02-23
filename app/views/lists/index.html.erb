@@ -1,0 +1,30 @@
+
+<div class="banner position-relative mb-4" style="background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url('<%=path_to_image('banner.jpg')%>')">
+  <div class="container">
+    <h1>Save any kind of movie</h1>
+    <div class="typed-js-cont">
+      <h3 class="typed-js" data-controller="typed-js"></h3>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h3>My Lists</h3>
+    <%= link_to 'Create new list', new_list_path, class: 'btn btn-flat' %>
+  </div>
+
+  <div class="cards">
+    <% @lists.each do |list| %>
+      <div class="card-category" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('<%= list.photo.attached? ? cl_image_path(list.photo.key, crop: :fill) : asset_path('list_background.jpg') %>')">
+        <%= link_to list.name, list_path(list) %>
+        <div class="card-actions">
+          <%= link_to '<i class="fas fa-trash"></i>'.html_safe,
+          list_path(list),
+          method: :delete,
+          data: { confirm: "Are you sure?" } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
