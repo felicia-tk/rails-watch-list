@@ -15,9 +15,3 @@ Rails.application.config.assets.version = "1.0"
 # [...]
 Rails.application.config.assets.paths << Rails.root.join("node_modules")
 
-# Gemfile
-# [...]
-gem "autoprefixer-rails"
-gem "font-awesome-sass", "~> 6.1"
-gem "simple_form", github: "heartcombo/simple_form"
-gem "sassc-rails"
